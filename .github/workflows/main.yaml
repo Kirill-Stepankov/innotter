@@ -9,7 +9,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Create dotenv files
         run: |
-          echo "${{ secrets.ENV_FILE }}" > innoter/.env
+          echo "${{ secrets.ENV_FILE }}" > innotter/.env
       - name: Start Docker daemon
         run: |
           sudo systemctl start docker
