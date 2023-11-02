@@ -1,0 +1,54 @@
+[tool.poetry]
+name = "innotter"
+version = "0.1.0"
+description = ""
+authors = ["Kirill-Stepankov <kirillstepankov18@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.7"
+pre-commit = "^3.5.0"
+django-environ = "^0.11.2"
+psycopg2-binary = "^2.9.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pre_commit]
+hooks = [
+  "trailing-whitespace",
+  "end-of-file-fixer",
+  "check-yaml",
+  "debug-statements",
+  "requirements-txt-fixer",
+  "black",
+  "isort",
+]
+
+[tool.pre_commit.hook-trailing-whitespace]
+files = ["*.py"]
+
+[tool.pre_commit.hook-end-of-file-fixer]
+files = ["*.py"]
+
+[tool.pre_commit.hook-check-yaml]
+files = ["*.yml", "*.yaml"]
+
+[tool.pre_commit.hook-debug-statements]
+files = ["*.py"]
+
+[tool.pre_commit.hook-double-quote-string-fixer]
+files = ["*.py"]
+
+[tool.pre_commit.hook-requirements-txt-fixer]
+files = ["requirements.txt"]
+
+[tool.pre_commit.hook-black]
+files = ["*.py"]
+
+[tool.pre_commit.hook-isort]
+args = ["--profile", "black"]
+files = ["*.py"]
