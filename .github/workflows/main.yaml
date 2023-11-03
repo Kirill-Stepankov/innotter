@@ -1,5 +1,14 @@
 name: main
-on: [ push, pull_request ]
+# on: [ push, pull_request ]
+on:
+  push:
+    branches:
+      - master
+      - dev
+  pull_request:
+    branches:
+      - master
+      - dev
 
 jobs:
   build:

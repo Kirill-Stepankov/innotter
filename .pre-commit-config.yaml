@@ -4,13 +4,24 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
+        exclude: >
+            (?x)^(
+                innotter/page/migrations/0002_remove_page_uuid.py|
+                innotter/tag/migrations/0001_initial.py|
+                path/to/file3.py
+            )$
       - id: check-yaml
       - id: debug-statements
   - repo: https://github.com/psf/black
     rev: 23.7.0
     hooks:
       - id: black
-        exclude: ^migrations/
+        exclude: >
+            (?x)^(
+                innotter/page/migrations/0002_remove_page_uuid.py|
+                innotter/tag/migrations/0001_initial.py|
+                path/to/file3.py
+            )$
   - repo: https://github.com/pre-commit/mirrors-isort
     rev: v5.10.0
     hooks:
