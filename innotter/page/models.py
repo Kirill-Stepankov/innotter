@@ -3,7 +3,7 @@ from tag.models import Tag
 
 
 class Page(models.Model):
-    name = models.CharField(max_length=80)
+    name = models.TextField()
     description = models.TextField()
     tags = models.ManyToManyField(Tag, related_name="pages")
     owner = models.UUIDField()
