@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
     "page",
     "post",
     "tag",
@@ -36,6 +37,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "innotter.middleware.AuthServiceMiddleware",
 ]
 
 ROOT_URLCONF = "innotter.urls"
@@ -86,6 +88,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (),
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        #'rest_framework.renderers.BrowsableAPIRenderer'
+    ],
+}
 
 LANGUAGE_CODE = "en-us"
 
@@ -100,3 +109,9 @@ STATIC_URL = "static/"
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+BUCKET_NAME = env("S3_BUCKET_NAME")
+REGION_NAME = "us-east-1"
+AWS_ENDPOINT_URL = env("LOCALSTACK_ENDPOINT_URL")

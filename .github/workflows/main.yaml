@@ -1,14 +1,14 @@
 name: main
-# on: [ push, pull_request ]
-on:
-  push:
-    branches:
-      - master
-      - dev
-  pull_request:
-    branches:
-      - master
-      - dev
+on: [ push, pull_request ]
+# on:
+#   push:
+#     branches:
+#       - master
+#       - dev
+#   pull_request:
+#     branches:
+#       - master
+#       - dev
 
 jobs:
   build:
@@ -22,6 +22,9 @@ jobs:
       - name: Start Docker daemon
         run: |
           sudo systemctl start docker
+      - name: Create docker network
+        run: |
+          docker network create innotter
       - name: Build and Run Docker containers
         run: |
           docker-compose up -d
