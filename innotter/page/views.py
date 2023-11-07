@@ -13,6 +13,7 @@ from .permissions import (
     IsAdmin,
     IsAdminOrIsOwnerOrIsModeratorOfTheOwner,
     IsAuthenticated,
+    IsModeratorOfThePageOwner,
     IsPageOwner,
 )
 from .serializer import PageSerializer
@@ -62,6 +63,25 @@ class PageViewSet(ModelViewSet):
             data={"detail": "Successfully unfollowed"},
             status=status.HTTP_204_NO_CONTENT,
         )
+
+    @action(
+        detail=True,
+        methods=["get"],
+        permission_classes=[IsAdminOrIsOwnerOrIsModeratorOfTheOwner],
+    )
+    def followers(self, request, pk=None):
+        pass
+
+    @action(
+        detail=True, methods=["patch"], permission_classes=[IsModeratorOfThePageOwner]
+    )
+    def block(self, request, pk=None):
+        pass
+
+    @action(detail=True, methods=["post"], permission_classes=[IsPageOwner])
+    def post(self, request, pk=None):
+        # сериализатор и тд
+        pass
 
     def get_permissions(self):
         try:
