@@ -73,7 +73,10 @@ class PageViewSet(ModelViewSet):
         pass
 
     @action(
-        detail=True, methods=["patch"], permission_classes=[IsModeratorOfThePageOwner]
+        detail=True,
+        methods=["patch"],
+        permission_classes=[IsModeratorOfThePageOwner]
+        # изменить вроде тут пермишен
     )
     def block(self, request, pk=None):
         pass

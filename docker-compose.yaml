@@ -6,24 +6,24 @@ services:
     command: sh ./entrypoint.sh
     build:
       context: ./innotter
-    volumes:
-      - ./innotter:/app
     ports:
       - "8001:8000"
-    networks:
-      - innotter
     depends_on:
       - innotter_db
+    volumes:
+      - ./innotter:/app
+    networks:
+      - innotter
   innotter_db:
     image: postgres:15
     ports:
       - "5432:5432"
     env_file:
       - innotter/.env
-    networks:
-      - innotter
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - innotter
 volumes:
   postgres_data:
 networks:
