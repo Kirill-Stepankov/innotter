@@ -1,6 +1,14 @@
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
-from .models import Page
+from .exceptions import (
+    AlreadyFollowerException,
+    NotAFollowerException,
+    PageDoesNotExistException,
+)
+from .models import Followers, Page
 from .permissions import (
     IsAdmin,
     IsAdminOrIsOwnerOrIsModeratorOfTheOwner,
@@ -40,6 +48,21 @@ class PageViewSet(ModelViewSet):
             image=key,
         )
 
+    @action(detail=True, methods=["patch"], permission_classes=[IsAuthenticated])
+    def follow(self, request, pk=None):
+        self._follow(pk, request.user_data)
+        return Response(
+            data={"detail": "Successfully followed"}, status=status.HTTP_201_CREATED
+        )
+
+    @action(detail=True, methods=["patch"], permission_classes=[IsAuthenticated])
+    def unfollow(self, request, pk=None):
+        self._unfollow(pk, request.user_data)
+        return Response(
+            data={"detail": "Successfully unfollowed"},
+            status=status.HTTP_204_NO_CONTENT,
+        )
+
     def get_permissions(self):
         try:
             return [
@@ -57,6 +80,33 @@ class PageViewSet(ModelViewSet):
             upload_file_s3(raw_data, key)
 
         return key
+
+    def _follow(self, pk, user_data):
+        page = Page.objects.filter(pk=pk).all()
+        if not page:
+            raise PageDoesNotExistException
+
+        followers = Followers.objects.filter(
+            post_id=pk, user=user_data.get("uuid")
+        ).all()
+        if followers:
+            raise AlreadyFollowerException
+
+        followers = Followers(post_id=pk, user=user_data.get("uuid"))
+        followers.save()
+
+    def _unfollow(self, pk, user_data):
+        page = Page.objects.filter(pk=pk).all()
+        if not page:
+            raise PageDoesNotExistException
+
+        followers = Followers.objects.filter(
+            post_id=pk, user=user_data.get("uuid")
+        ).all()
+        if not followers:
+            raise NotAFollowerException
+
+        followers.delete()
 
     # переоперделить retrieve
     # добавить экшены
