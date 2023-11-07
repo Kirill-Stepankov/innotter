@@ -89,6 +89,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (),
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         #'rest_framework.renderers.BrowsableAPIRenderer'
@@ -108,3 +109,9 @@ STATIC_URL = "static/"
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+BUCKET_NAME = env("S3_BUCKET_NAME")
+REGION_NAME = "us-east-1"
+AWS_ENDPOINT_URL = env("LOCALSTACK_ENDPOINT_URL")

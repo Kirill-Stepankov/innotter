@@ -1,8 +1,11 @@
 from django.urls import include, path
 from rest_framework import routers
+from rest_framework.routers import SimpleRouter
 
-from . import views
+from .views import PageViewSet
 
-urlpatterns = [
-    path("", views.ListUsers.as_view()),
-]
+router = SimpleRouter()
+router.register(r"page", PageViewSet)
+
+
+urlpatterns = router.urls
