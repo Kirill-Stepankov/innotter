@@ -28,9 +28,6 @@ jobs:
       - name: Build and Run Docker containers
         run: |
           docker-compose up -d
-      - name: Set Django settings module
-        run: |
-          docker-compose exec -T web export DJANGO_SETTINGS_MODULE=innotter.settings
       - name: Run tests
         run: |
           docker-compose exec -T web python -m pytest
