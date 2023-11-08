@@ -41,3 +41,13 @@ class IsAdminOrIsOwnerOrIsModeratorOfTheOwner(BasePermission):
             or request.user_data.get("role") == "Moderator"
             and obj.owner_group_id == request.user_data.get("group_id")
         )
+
+
+class IsAdminOrIsModeratorOfThePageOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return bool(
+            request.user_data
+            and request.user_data.get("role") == "Admin"
+            or request.user_data.get("role") == "Moderator"
+            and obj.owner_group_id == request.user_data.get("group_id")
+        )

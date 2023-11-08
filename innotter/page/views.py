@@ -1,3 +1,4 @@
+from post.serializer import PostSerializer
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -10,7 +11,7 @@ from .exceptions import (
 )
 from .models import Followers, Page
 from .permissions import (
-    IsAdmin,
+    IsAdminOrIsModeratorOfThePageOwner,
     IsAdminOrIsOwnerOrIsModeratorOfTheOwner,
     IsAuthenticated,
     IsModeratorOfThePageOwner,
@@ -53,14 +54,14 @@ class PageViewSet(ModelViewSet):
     def follow(self, request, pk=None):
         self._follow(pk, request.user_data)
         return Response(
-            data={"detail": "Successfully followed"}, status=status.HTTP_201_CREATED
+            data={"detail": "Successfully followed."}, status=status.HTTP_201_CREATED
         )
 
     @action(detail=True, methods=["patch"], permission_classes=[IsAuthenticated])
     def unfollow(self, request, pk=None):
         self._unfollow(pk, request.user_data)
         return Response(
-            data={"detail": "Successfully unfollowed"},
+            data={"detail": "Successfully unfollowed."},
             status=status.HTTP_204_NO_CONTENT,
         )
 
@@ -75,16 +76,19 @@ class PageViewSet(ModelViewSet):
     @action(
         detail=True,
         methods=["patch"],
-        permission_classes=[IsModeratorOfThePageOwner]
-        # изменить вроде тут пермишен
+        permission_classes=[IsAdminOrIsModeratorOfThePageOwner],
     )
     def block(self, request, pk=None):
-        pass
+        self._block_page()
+        return Response(
+            data={"detail": "Successfully blocked."},
+            status=status.HTTP_200_OK,
+        )
 
     @action(detail=True, methods=["post"], permission_classes=[IsPageOwner])
     def post(self, request, pk=None):
-        # сериализатор и тд
-        pass
+        data = self._perform_post_create(request.data, PostSerializer)
+        return Response(data, status=status.HTTP_201_CREATED)
 
     def get_permissions(self):
         try:
@@ -130,6 +134,17 @@ class PageViewSet(ModelViewSet):
             raise NotAFollowerException
 
         followers.delete()
+
+    def _block_page(self):
+        page = self.get_object()
+        page.is_blocked = True
+        page.save()
+
+    def _perform_post_create(self, data, post_serializer):
+        serializer = post_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(page=self.get_object())
+        return serializer.data
 
     # переоперделить retrieve
     # добавить экшены
