@@ -1,5 +1,6 @@
 import pytest
 import requests
+from page.models import Page
 from page.permissions import IsAuthenticated
 from tag.models import Tag
 
@@ -22,7 +23,7 @@ def user_credentials():
 
 @pytest.fixture
 def page_credentials():
-    return {"name": "pagetest", "description": "testdesc", "tags": 1}
+    return {"name": "pagetest", "description": "testdesc", "tags": [1]}
 
 
 @pytest.fixture
@@ -40,5 +41,13 @@ def tag_credentials():
 
 @pytest.fixture
 def tag(db, tag_credentials):
-    tag = Tag(**tag_credentials)
-    tag.save()
+    tag = Tag.objects.create(**tag_credentials)
+    return tag
+
+
+@pytest.fixture
+def page(db, page_credentials, tag):
+    del page_credentials["tags"]
+    page = Page.objects.create(**page_credentials)
+    page.tags.add(tag.id)
+    return page

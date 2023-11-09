@@ -1,3 +1,4 @@
+import logging
 from collections import OrderedDict
 
 from post.serializer import PostSerializer
@@ -22,6 +23,8 @@ from .permissions import (
 )
 from .serializer import PageSerializer
 from .utils import upload_file_s3
+
+logger = logging.getLogger(__name__)
 
 
 class PageViewSet(
@@ -96,6 +99,7 @@ class PageViewSet(
         permission_classes=[IsAdminOrIsOwnerOrIsModeratorOfTheOwner],
     )
     def followers(self, request, pk=None):
+        logger.debug("hello")
         followers = Followers.objects.filter(page_id=pk).values("user")
         return Response(followers)
 
