@@ -1,8 +1,11 @@
+from collections import OrderedDict
+
 from post.serializer import PostSerializer
-from rest_framework import status
+from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
+from tag.pagination import PageNumberOffsetPagination
 
 from .exceptions import (
     AlreadyFollowerException,
@@ -21,7 +24,13 @@ from .serializer import PageSerializer
 from .utils import upload_file_s3
 
 
-class PageViewSet(ModelViewSet):
+class PageViewSet(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
     queryset = Page.objects.all()
     serializer_class = PageSerializer
     permission_classes_by_action = {
@@ -30,8 +39,24 @@ class PageViewSet(ModelViewSet):
         "update": [IsPageOwner],
         "partial_update": [IsPageOwner],
         "destroy": [IsAdminOrIsOwnerOrIsModeratorOfTheOwner],
-        "list": [IsAuthenticated],
     }
+    pagination_class = PageNumberOffsetPagination
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        queryset = instance.posts.all()
+
+        page = self.paginate_queryset(queryset)
+        serializer = PostSerializer(page, many=True)
+
+        response = self.get_paginated_response(serializer.data)
+
+        instance_data = self.get_serializer(instance).data
+        data = OrderedDict(instance_data)
+        data.update(response.data)
+
+        response.data = data
+        return response
 
     def perform_update(self, serializer):
         key = serializer.validated_data.get("name") or self.get_object().name
