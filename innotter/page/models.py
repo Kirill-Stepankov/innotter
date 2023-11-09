@@ -16,5 +16,7 @@ class Page(models.Model):
 
 
 class Followers(models.Model):
-    post = models.ForeignKey(Page, on_delete=models.CASCADE, related_name="follows")
+    page = models.ForeignKey(
+        Page, on_delete=models.CASCADE, related_name="follows"
+    )  # изменить post на page
     user = models.UUIDField()

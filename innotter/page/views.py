@@ -139,12 +139,12 @@ class PageViewSet(
             raise PageDoesNotExistException
 
         followers = Followers.objects.filter(
-            post_id=pk, user=user_data.get("uuid")
+            page_id=pk, user=user_data.get("uuid")
         ).all()
         if followers:
             raise AlreadyFollowerException
 
-        followers = Followers(post_id=pk, user=user_data.get("uuid"))
+        followers = Followers(page_id=pk, user=user_data.get("uuid"))
         followers.save()
 
     def _unfollow(self, pk, user_data):
@@ -153,7 +153,7 @@ class PageViewSet(
             raise PageDoesNotExistException
 
         followers = Followers.objects.filter(
-            post_id=pk, user=user_data.get("uuid")
+            page_id=pk, user=user_data.get("uuid")
         ).all()
         if not followers:
             raise NotAFollowerException

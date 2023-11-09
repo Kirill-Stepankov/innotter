@@ -1,4 +1,8 @@
+from page.models import Followers
+from page.permissions import IsAuthenticated
 from rest_framework import mixins
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from .models import Post
@@ -23,3 +27,17 @@ class PostViewsSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericVie
             ]
         except KeyError:
             return [permission() for permission in self.permission_classes]
+
+
+class Feed(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        followers = Followers.objects.filter(
+            user=request.user_data.get("uuid")
+        ).select_related("page")
+        posts = Post.objects.filter(page__follows__in=followers)
+
+        serializer = PostSerializer(posts, many=True)
+
+        return Response(serializer.data)
