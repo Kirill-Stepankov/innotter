@@ -25,4 +25,9 @@ class TagViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, GenericViewSet)
         except KeyError:
             return [permission() for permission in self.permission_classes]
 
-    # override list
+    def get_queryset(self):
+        name = self.request.query_params.get("filter_by_name")
+        if not name:
+            return super().get_queryset()
+
+        return Tag.objects.filter(name__icontains=name)
