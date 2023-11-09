@@ -96,7 +96,8 @@ class PageViewSet(
         permission_classes=[IsAdminOrIsOwnerOrIsModeratorOfTheOwner],
     )
     def followers(self, request, pk=None):
-        pass
+        followers = Followers.objects.filter(page_id=pk).values("user")
+        return Response(followers)
 
     @action(
         detail=True,
