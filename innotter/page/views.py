@@ -147,4 +147,3 @@ class PageViewSet(ModelViewSet):
         return serializer.data
 
     # переоперделить retrieve
-    # добавить экшены

@@ -5,7 +5,6 @@ from .models import Post
 
 class IsAdminOrIsOwnerOrIsModeratorOfTheOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
-        print("sss")
         return bool(
             request.user_data
             and request.user_data.get("role") == "Admin"
