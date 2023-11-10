@@ -100,6 +100,7 @@ class PageViewSet(
     )
     def followers(self, request, pk=None):
         logger.debug("hello")
+        page = self.get_object()
         followers = Followers.objects.filter(page_id=pk).values("user")
         return Response(followers)
 

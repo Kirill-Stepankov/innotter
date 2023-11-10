@@ -167,3 +167,32 @@ def test_create_page_post(
 
     if is_pageowner:
         assert response.json().get("content") == post_credentials.get("content")
+
+
+@pytest.mark.parametrize(
+    "is_admin, is_page_owner, is_owner_moderator, expected_status",
+    [
+        (False, False, False, 403),
+        (True, False, False, 200),
+        (False, True, False, 200),
+        (False, False, True, 200),
+        (True, True, False, 200),
+    ],
+)
+@pytest.mark.django_db
+def test_followers_page(
+    is_admin,
+    is_page_owner,
+    is_owner_moderator,
+    expected_status,
+    is_owner_or_admin_or_moderator_mock,
+    mock_get,
+    page,
+):
+    is_owner_or_admin_or_moderator_mock.return_value = (
+        is_page_owner or is_admin or is_owner_moderator
+    )
+
+    response = client.get(f"/page/{page.id}/followers/", HTTP_token="token")
+
+    assert response.status_code == expected_status
