@@ -8,7 +8,7 @@ client = APIClient()
     "is_authenticated, expected_status", [(True, 201), (False, 403)]
 )
 @pytest.mark.django_db
-def test_create_task(
+def test_create_page(
     is_authenticated,
     expected_status,
     is_authenticated_mock,
@@ -27,7 +27,7 @@ def test_create_task(
     "is_authenticated, expected_status", [(True, 200), (False, 403)]
 )
 @pytest.mark.django_db
-def test_retrieve_task(
+def test_retrieve_page(
     is_authenticated,
     expected_status,
     is_authenticated_mock,
@@ -43,7 +43,7 @@ def test_retrieve_task(
 
 @pytest.mark.parametrize("is_pageowner, expected_status", [(True, 200), (False, 403)])
 @pytest.mark.django_db
-def test_update_task(
+def test_update_page(
     is_pageowner,
     expected_status,
     is_page_owner_mock,
@@ -73,7 +73,7 @@ def test_update_task(
     ],
 )
 @pytest.mark.django_db
-def test_destroy_task(
+def test_destroy_page(
     is_admin,
     is_page_owner,
     is_owner_moderator,
@@ -87,5 +87,41 @@ def test_destroy_task(
     )
 
     response = client.delete(f"/page/{page.id}/", HTTP_token="token")
+
+    assert response.status_code == expected_status
+
+
+@pytest.mark.parametrize(
+    "is_authenticated, expected_status", [(True, 201), (False, 403)]
+)
+@pytest.mark.django_db
+def test_follow_page(
+    is_authenticated,
+    expected_status,
+    is_authenticated_mock,
+    mock_get,
+    page,
+):
+    is_authenticated_mock.return_value = is_authenticated
+
+    response = client.patch(f"/page/{page.id}/follow/", HTTP_token="token")
+
+    assert response.status_code == expected_status
+
+
+@pytest.mark.parametrize(
+    "is_authenticated, expected_status", [(True, 204), (False, 403)]
+)
+@pytest.mark.django_db
+def test_unfollow_page(
+    is_authenticated,
+    expected_status,
+    is_authenticated_mock,
+    mock_get,
+    follower,
+):
+    is_authenticated_mock.return_value = is_authenticated
+
+    response = client.patch(f"/page/{follower.page.id}/unfollow/", HTTP_token="token")
 
     assert response.status_code == expected_status

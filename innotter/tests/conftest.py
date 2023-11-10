@@ -1,6 +1,6 @@
 import pytest
 import requests
-from page.models import Page
+from page.models import Followers, Page
 from page.permissions import (
     IsAdmin,
     IsAdminOrIsOwnerOrIsModeratorOfTheOwner,
@@ -83,3 +83,11 @@ def page(db, page_credentials, tag):
     page = Page.objects.create(**page_credentials)
     page.tags.add(tag.id)
     return page
+
+
+@pytest.fixture
+def follower(page, user_credentials):
+    followers = Followers.objects.create(
+        page_id=page.id, user=user_credentials.get("uuid")
+    )
+    return followers
