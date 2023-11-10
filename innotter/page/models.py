@@ -14,6 +14,9 @@ class Page(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ["updated_at"]
+
 
 class Followers(models.Model):
     page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name="follows")

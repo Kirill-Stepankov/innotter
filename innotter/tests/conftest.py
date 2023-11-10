@@ -1,13 +1,45 @@
 import pytest
 import requests
 from page.models import Page
-from page.permissions import IsAuthenticated
+from page.permissions import (
+    IsAdmin,
+    IsAdminOrIsOwnerOrIsModeratorOfTheOwner,
+    IsAuthenticated,
+    IsModeratorOfThePageOwner,
+    IsPageOwner,
+)
 from tag.models import Tag
 
 
 @pytest.fixture
 def is_authenticated_mock(mocker):
     mock = mocker.patch.object(IsAuthenticated, "has_permission")
+    return mock
+
+
+@pytest.fixture
+def is_page_owner_mock(mocker):
+    mock = mocker.patch.object(IsPageOwner, "has_object_permission")
+    return mock
+
+
+@pytest.fixture
+def is_admin_mock(mocker):
+    mock = mocker.patch.object(IsAdmin, "has_permission")
+    return mock
+
+
+@pytest.fixture
+def is_owner_moderator_mock(mocker):
+    mock = mocker.patch.object(IsModeratorOfThePageOwner, "has_object_permission")
+    return mock
+
+
+@pytest.fixture
+def is_owner_or_admin_or_moderator_mock(mocker):
+    mock = mocker.patch.object(
+        IsAdminOrIsOwnerOrIsModeratorOfTheOwner, "has_object_permission"
+    )
     return mock
 
 
