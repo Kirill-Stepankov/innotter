@@ -3,6 +3,7 @@ import requests
 from page.models import Followers, Page
 from page.permissions import (
     IsAdmin,
+    IsAdminOrIsModeratorOfThePageOwner,
     IsAdminOrIsOwnerOrIsModeratorOfTheOwner,
     IsAuthenticated,
     IsModeratorOfThePageOwner,
@@ -39,6 +40,14 @@ def is_owner_moderator_mock(mocker):
 def is_owner_or_admin_or_moderator_mock(mocker):
     mock = mocker.patch.object(
         IsAdminOrIsOwnerOrIsModeratorOfTheOwner, "has_object_permission"
+    )
+    return mock
+
+
+@pytest.fixture
+def is_admin_or_owner_moderator_mock(mocker):
+    mock = mocker.patch.object(
+        IsAdminOrIsModeratorOfThePageOwner, "has_object_permission"
     )
     return mock
 

@@ -58,7 +58,7 @@ def test_update_page(
 
     assert response.status_code == expected_status
 
-    if expected_status == 200:
+    if is_pageowner:
         assert response.json().get("name") == new_credentials.get("name")
 
 
@@ -123,5 +123,30 @@ def test_unfollow_page(
     is_authenticated_mock.return_value = is_authenticated
 
     response = client.patch(f"/page/{follower.page.id}/unfollow/", HTTP_token="token")
+
+    assert response.status_code == expected_status
+
+
+@pytest.mark.parametrize(
+    "is_admin, is_owner_moderator, expected_status",
+    [
+        (False, False, 403),
+        (True, False, 200),
+        (False, True, 200),
+        (True, True, 200),
+    ],
+)
+@pytest.mark.django_db
+def test_block_page(
+    is_admin,
+    is_owner_moderator,
+    expected_status,
+    is_admin_or_owner_moderator_mock,
+    mock_get,
+    page,
+):
+    is_admin_or_owner_moderator_mock.return_value = is_admin or is_owner_moderator
+
+    response = client.patch(f"/page/{page.id}/block/", HTTP_token="token")
 
     assert response.status_code == expected_status
