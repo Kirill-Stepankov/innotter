@@ -1,12 +1,10 @@
-from django.urls import path
+from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from .views import Feed, PostViewsSet
 
 router = SimpleRouter()
-router.register(r"", PostViewsSet)
+router.register(r"post", PostViewsSet)
 
 
-urlpatterns = router.urls
-
-urlpatterns += [path("feed/", Feed.as_view())]
+urlpatterns = [path("", include(router.urls)), path("feed/", Feed.as_view())]

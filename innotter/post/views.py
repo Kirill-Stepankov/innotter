@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from .models import Post
-from .permissions import IsAdminOrIsOwnerOrIsModeratorOfTheOwner
+from .permissions import IsAdminOrIsOwnerOrIsModeratorOfTheOwnerOfPost
 from .serializer import PostSerializer
 
 
@@ -14,9 +14,9 @@ class PostViewsSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericVie
     queryset = Post.objects.all().prefetch_related("page")
     serializer_class = PostSerializer
     permission_classes_by_action = {
-        "update": [IsAdminOrIsOwnerOrIsModeratorOfTheOwner],
-        "partial_update": [IsAdminOrIsOwnerOrIsModeratorOfTheOwner],
-        "destroy": [IsAdminOrIsOwnerOrIsModeratorOfTheOwner],
+        "update": [IsAdminOrIsOwnerOrIsModeratorOfTheOwnerOfPost],
+        "partial_update": [IsAdminOrIsOwnerOrIsModeratorOfTheOwnerOfPost],
+        "destroy": [IsAdminOrIsOwnerOrIsModeratorOfTheOwnerOfPost],
     }
 
     def get_permissions(self):

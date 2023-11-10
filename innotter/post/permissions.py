@@ -3,7 +3,7 @@ from rest_framework.permissions import BasePermission
 from .models import Post
 
 
-class IsAdminOrIsOwnerOrIsModeratorOfTheOwner(BasePermission):
+class IsAdminOrIsOwnerOrIsModeratorOfTheOwnerOfPost(BasePermission):
     def has_object_permission(self, request, view, obj):
         return bool(
             request.user_data
