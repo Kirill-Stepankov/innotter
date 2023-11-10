@@ -28,7 +28,7 @@ python_files = [
   '*_tests.py'
 ]
 pythonpath = '. app'
-addopts = "-vv -x --lf --cov=. tests/"
+addopts = "-vv -x --lf --cov=. tests/ --cov-fail-under 80"
 testpaths = [
     "tests",
 ]
