@@ -150,3 +150,20 @@ def test_block_page(
     response = client.patch(f"/page/{page.id}/block/", HTTP_token="token")
 
     assert response.status_code == expected_status
+
+
+@pytest.mark.parametrize("is_pageowner, expected_status", [(True, 201), (False, 403)])
+@pytest.mark.django_db
+def test_create_page_post(
+    is_pageowner, expected_status, is_page_owner_mock, mock_get, page, post_credentials
+):
+    is_page_owner_mock.return_value = is_pageowner
+
+    response = client.post(
+        f"/page/{page.id}/post/", post_credentials, HTTP_token="token"
+    )
+
+    assert response.status_code == expected_status
+
+    if is_pageowner:
+        assert response.json().get("content") == post_credentials.get("content")

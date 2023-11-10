@@ -100,3 +100,8 @@ def follower(page, user_credentials):
         page_id=page.id, user=user_credentials.get("uuid")
     )
     return followers
+
+
+@pytest.fixture
+def post_credentials(page):
+    return {"page": page.id, "content": "testcontent"}
