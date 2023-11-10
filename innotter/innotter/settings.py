@@ -101,7 +101,7 @@ LOGGING = {
             "level": "DEBUG",
             "class": "logging.FileHandler",
             "formatter": "file",
-            "filename": "debug.log",
+            "filename": env("LOGGING_FILENAME"),
         },
     },
     "loggers": {"": {"level": "DEBUG", "handlers": ["console", "file"]}},
