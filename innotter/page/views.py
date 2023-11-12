@@ -1,8 +1,12 @@
+import logging
+from collections import OrderedDict
+
 from post.serializer import PostSerializer
-from rest_framework import status
+from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
+from tag.pagination import PageNumberOffsetPagination
 
 from .exceptions import (
     AlreadyFollowerException,
@@ -20,8 +24,16 @@ from .permissions import (
 from .serializer import PageSerializer
 from .utils import upload_file_s3
 
+logger = logging.getLogger(__name__)
 
-class PageViewSet(ModelViewSet):
+
+class PageViewSet(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
     queryset = Page.objects.all()
     serializer_class = PageSerializer
     permission_classes_by_action = {
@@ -30,8 +42,24 @@ class PageViewSet(ModelViewSet):
         "update": [IsPageOwner],
         "partial_update": [IsPageOwner],
         "destroy": [IsAdminOrIsOwnerOrIsModeratorOfTheOwner],
-        "list": [IsAuthenticated],
     }
+    pagination_class = PageNumberOffsetPagination
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        queryset = instance.posts.all()
+
+        page = self.paginate_queryset(queryset)
+        serializer = PostSerializer(page, many=True)
+
+        response = self.get_paginated_response(serializer.data)
+
+        instance_data = self.get_serializer(instance).data
+        data = OrderedDict(instance_data)
+        data.update(response.data)
+
+        response.data = data
+        return response
 
     def perform_update(self, serializer):
         key = serializer.validated_data.get("name") or self.get_object().name
@@ -71,7 +99,10 @@ class PageViewSet(ModelViewSet):
         permission_classes=[IsAdminOrIsOwnerOrIsModeratorOfTheOwner],
     )
     def followers(self, request, pk=None):
-        pass
+        logger.debug("hello")
+        page = self.get_object()
+        followers = Followers.objects.filter(page_id=pk).values("user")
+        return Response(followers)
 
     @action(
         detail=True,
@@ -114,12 +145,12 @@ class PageViewSet(ModelViewSet):
             raise PageDoesNotExistException
 
         followers = Followers.objects.filter(
-            post_id=pk, user=user_data.get("uuid")
+            page_id=pk, user=user_data.get("uuid")
         ).all()
         if followers:
             raise AlreadyFollowerException
 
-        followers = Followers(post_id=pk, user=user_data.get("uuid"))
+        followers = Followers(page_id=pk, user=user_data.get("uuid"))
         followers.save()
 
     def _unfollow(self, pk, user_data):
@@ -128,7 +159,7 @@ class PageViewSet(ModelViewSet):
             raise PageDoesNotExistException
 
         followers = Followers.objects.filter(
-            post_id=pk, user=user_data.get("uuid")
+            page_id=pk, user=user_data.get("uuid")
         ).all()
         if not followers:
             raise NotAFollowerException

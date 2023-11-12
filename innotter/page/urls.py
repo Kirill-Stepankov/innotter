@@ -5,7 +5,7 @@ from rest_framework.routers import SimpleRouter
 from .views import PageViewSet
 
 router = SimpleRouter()
-router.register(r"page", PageViewSet)
+router.register(r"", PageViewSet)
 
 
 urlpatterns = router.urls
