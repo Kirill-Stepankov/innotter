@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "django_celery_beat",
     "page",
     "post",
     "tag",
@@ -98,13 +99,13 @@ LOGGING = {
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "console"},
         "file": {
-            "level": "DEBUG",
+            "level": "INFO",
             "class": "logging.FileHandler",
             "formatter": "file",
             "filename": env("LOGGING_FILENAME"),
         },
     },
-    "loggers": {"": {"level": "DEBUG", "handlers": ["console", "file"]}},
+    "loggers": {"": {"level": "INFO", "handlers": ["console", "file"]}},
 }
 
 REST_FRAMEWORK = {
@@ -135,3 +136,7 @@ AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
 BUCKET_NAME = env("S3_BUCKET_NAME")
 REGION_NAME = "us-east-1"
 AWS_ENDPOINT_URL = env("LOCALSTACK_ENDPOINT_URL")
+
+
+CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
