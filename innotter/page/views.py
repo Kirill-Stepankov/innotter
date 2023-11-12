@@ -68,6 +68,7 @@ class PageViewSet(
         serializer.save(image=key)
 
     def perform_create(self, serializer):
+        # add logger
         key = None
         key = self._upload_file(key, serializer)
 
