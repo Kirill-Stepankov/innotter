@@ -24,6 +24,18 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     networks:
       - innotter
+  celery_worker:
+    build:
+      context: ./innotter
+    command: celery -A innotter worker -l info --pool=solo
+    networks:
+      - innotter
+  celery_beat:
+    build:
+      context: ./innotter
+    command: celery -A innotter beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    networks:
+      - innotter
 volumes:
   postgres_data:
 networks:
