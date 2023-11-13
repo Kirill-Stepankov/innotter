@@ -1,0 +1,45 @@
+name: main
+on: [ push, pull_request ]
+# on:
+#   push:
+#     branches:
+#       - master
+#       - dev
+#   pull_request:
+#     branches:
+#       - master
+#       - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Create dotenv files
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > innotter/.env
+      - name: Start Docker daemon
+        run: |
+          sudo systemctl start docker
+      - name: Create docker network
+        run: |
+          docker network create innotter
+      - name: Build and Run Docker containers
+        run: |
+          docker-compose up -d
+      - name: Run tests
+        run: |
+          docker-compose exec -T web python -m pytest
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install pre-commit
+        run: |
+          python -m pip install pre-commit
+      - name: Run pre-commit checks
+        run: |
+          pre-commit run --all-files --show-diff-on-failure
