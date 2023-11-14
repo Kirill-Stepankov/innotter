@@ -1,11 +1,12 @@
 from kafka import KafkaProducer
 
+from .settings import env
 
-# env vars
+
 class KafkaProducerWrapper:
     def __init__(self):
         self.producer = KafkaProducer(
-            bootstrap_servers="kafka:9093",
+            bootstrap_servers=env("KAFKA_BOOTSTRAP_SERVERS"),
             value_serializer=lambda v: str(v).encode("utf-8"),
         )
 

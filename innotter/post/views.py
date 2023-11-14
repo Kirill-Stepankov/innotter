@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
+from innotter.producer import kafka_producer
+
 from .models import Likes, Post
 from .permissions import IsAdminOrIsOwnerOrIsModeratorOfTheOwnerOfPost
 from .serializer import PostSerializer
@@ -32,11 +34,19 @@ class PostViewsSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericVie
     @action(detail=True, methods=["patch"], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
         like = self._like(request.user_data, pk)
+
+        payload = {"page_id": pk, "type": "like"}
+        kafka_producer.produce_message("posts", payload)
+
         return Response(data={"detail": "Post is liked."})
 
     @action(detail=True, methods=["patch"], permission_classes=[IsAuthenticated])
     def unlike(self, request, pk=None):
         self._unlike(request.user_data, pk)
+
+        payload = {"page_id": pk, "type": "unlike"}
+        kafka_producer.produce_message("posts", payload)
+
         return Response(data={"detail": "Post is unliked."})
 
     def _like(self, user_data, pk):
