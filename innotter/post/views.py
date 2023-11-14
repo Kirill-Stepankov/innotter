@@ -35,8 +35,8 @@ class PostViewsSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericVie
     def like(self, request, pk=None):
         like = self._like(request.user_data, pk)
 
-        payload = {"page_id": pk, "type": "like"}
-        kafka_producer.produce_message("posts", payload)
+        payload = {"page_id": pk, "stats_type": "like", "operation": 1}
+        kafka_producer.produce_message("pages", payload)
 
         return Response(data={"detail": "Post is liked."})
 
@@ -44,8 +44,8 @@ class PostViewsSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericVie
     def unlike(self, request, pk=None):
         self._unlike(request.user_data, pk)
 
-        payload = {"page_id": pk, "type": "unlike"}
-        kafka_producer.produce_message("posts", payload)
+        payload = {"page_id": pk, "stats_type": "like", "operation": 0}
+        kafka_producer.produce_message("pages", payload)
 
         return Response(data={"detail": "Post is unliked."})
 
