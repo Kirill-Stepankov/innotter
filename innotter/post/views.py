@@ -76,7 +76,7 @@ class PostViewsSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericVie
     def _send_stats(self, pk, page_pk, operation, owner_id, owner_email):
         payload = {
             "page_id": page_pk,
-            "post_id": pk,
+            "post_id": int(pk),
             "stats_type": "like",
             "operation": operation,
             "user_email": owner_email,
