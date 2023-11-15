@@ -16,4 +16,6 @@ class KafkaProducerWrapper:
         self.producer.send(topic, value=message)
 
 
-kafka_producer = KafkaProducerWrapper()
+kafka_producer = None
+if not int(env("TESTING")):
+    kafka_producer = KafkaProducerWrapper()
