@@ -33,7 +33,7 @@ class PostViewsSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericVie
 
     @action(detail=True, methods=["patch"], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
-        like = self._like(request.user_data, pk)
+        self._like(request.user_data, pk)
         return Response(data={"detail": "Post is liked."})
 
     @action(detail=True, methods=["patch"], permission_classes=[IsAuthenticated])
@@ -42,34 +42,47 @@ class PostViewsSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericVie
         return Response(data={"detail": "Post is unliked."})
 
     def _like(self, user_data, pk):
-        likes = Likes.objects.filter(post_id=pk, user=user_data.get("uuid"))
+        likes = (
+            Likes.objects.filter(post_id=pk, user=user_data.get("uuid"))
+            .select_related("post", "post__page")
+            .first()
+        )
         if not likes:
-            payload = {
-                "page_id": pk,
-                "stats_type": "like",
-                "operation": 0,
-                "user_email": user_data.get("email"),
-                "user_id": user_data.get("uuid"),
-            }
+            instance = self.get_object()
+            self._send_stats(
+                pk, instance.page.pk, 1, instance.page.owner, instance.page.owner_email
+            )
             likes = Likes.objects.create(post_id=pk, user=user_data.get("uuid"))
-            kafka_producer.produce_message("pages", payload)
-
-        return likes
 
     def _unlike(self, user_data, pk):
-        likes = Likes.objects.filter(post_id=pk, user=user_data.get("uuid"))
-
+        likes = (
+            Likes.objects.filter(post_id=pk, user=user_data.get("uuid"))
+            .select_related(
+                "post",
+                "post__page",
+            )
+            .first()
+        )
         if likes:
-            payload = {
-                "page_id": pk,
-                "stats_type": "like",
-                "operation": 1,
-                "user_email": user_data.get("email"),
-                "user_id": user_data.get("uuid"),
-            }
-            kafka_producer.produce_message("pages", payload)
-
+            self._send_stats(
+                pk,
+                likes.post.page.pk,
+                0,
+                likes.post.page.owner,
+                likes.post.page.owner_email,
+            )
             Likes.objects.filter(post_id=pk, user=user_data.get("uuid")).delete()
+
+    def _send_stats(self, pk, page_pk, operation, owner_id, owner_email):
+        payload = {
+            "page_id": page_pk,
+            "post_id": pk,
+            "stats_type": "like",
+            "operation": operation,
+            "user_email": owner_email,
+            "user_id": owner_id,
+        }
+        kafka_producer.produce_message("pages", payload)
 
 
 class Feed(APIView):

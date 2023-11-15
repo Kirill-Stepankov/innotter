@@ -1,5 +1,7 @@
 import os
+from json import JSONEncoder
 from pathlib import Path
+from uuid import UUID
 
 import environ
 
@@ -140,3 +142,14 @@ AWS_ENDPOINT_URL = env("LOCALSTACK_ENDPOINT_URL")
 
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
+
+old_default = JSONEncoder.default
+
+
+def new_default(self, obj):
+    if isinstance(obj, UUID):
+        return str(obj)
+    return old_default(self, obj)
+
+
+JSONEncoder.default = new_default
