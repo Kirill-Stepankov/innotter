@@ -74,6 +74,7 @@ class PageViewSet(
         serializer.save(
             owner=self.request.user_data.get("uuid"),
             owner_group_id=self.request.user_data.get("group_id"),
+            owner_email=self.request.user_data.get("email"),
             image=key,
         )
 
@@ -175,5 +176,3 @@ class PageViewSet(
         serializer.is_valid(raise_exception=True)
         serializer.save(page=self.get_object())
         return serializer.data
-
-    # переоперделить retrieve
